@@ -10,6 +10,7 @@ gcode:
     {% set z_drop_speed = printer["gcode_macro _USER_VARIABLES"].z_drop_speed * 60 %}
     {% set light_intensity_start_print = printer["gcode_macro _USER_VARIABLES"].light_intensity_start_print %}
 
+
     {% set homing_first = printer["gcode_macro _USER_VARIABLES"].homing_first|string|upper %}
     {% set x_homing_backoff, y_homing_backoff = printer["gcode_macro _USER_VARIABLES"].homing_backoff_distance_xy|map('float') %}
 
@@ -83,18 +84,7 @@ gcode:
     {% endif %}
 
     {% if homing_first == "X" %}
-        {% if X %}
-            {% if ('z' in printer.toolhead.homed_axes) and (printer.toolhead.position.z < homing_zhop) %}
-                { action_respond_info("Z too low, performing ZHOP before homing X") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% elif not 'z' in printer.toolhead.homed_axes %}
-                { action_respond_info("Z not homed, performing safe ZHOP before homing X") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% endif %}
+        {% if X %} # Home x
             { action_respond_info("Homing X") }
             
             {% set old_current_x = printer.configfile.config[x_driver ~ ' stepper_x'].run_current|float %}
@@ -114,18 +104,8 @@ gcode:
 
         {% endif %}
 
-        {% if Y %}
-            {% if ('z' in printer.toolhead.homed_axes) and (printer.toolhead.position.z < homing_zhop) %}
-                { action_respond_info("Z too low, performing ZHOP before homing Y") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% elif not 'z' in printer.toolhead.homed_axes %}
-                { action_respond_info("Z not homed, performing safe ZHOP before homing Y") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% endif %}
+        {% if Y %} # Home y
+
             { action_respond_info("Homing Y") }
 
             {% set old_current_x = printer.configfile.config[x_driver ~ ' stepper_x'].run_current|float %}
@@ -146,18 +126,7 @@ gcode:
         {% endif %}
 
     {% elif homing_first == "Y" %}
-        {% if Y %}
-            {% if ('z' in printer.toolhead.homed_axes) and (printer.toolhead.position.z < homing_zhop) %}
-                { action_respond_info("Z too low, performing ZHOP before homing Y") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% elif not 'z' in printer.toolhead.homed_axes %}
-                { action_respond_info("Z not homed, performing safe ZHOP before homing Y") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% endif %}
+        {% if Y %} # Home y
             { action_respond_info("Homing Y") }
             
             {% set old_current_x = printer.configfile.config[x_driver ~ ' stepper_x'].run_current|float %}
@@ -177,19 +146,7 @@ gcode:
                 
         {% endif %}
 
-        {% if X %}
-            {% if ('z' in printer.toolhead.homed_axes) and (printer.toolhead.position.z < homing_zhop) %}
-                { action_respond_info("Z too low, performing ZHOP before homing X") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% elif not 'z' in printer.toolhead.homed_axes %}
-                { action_respond_info("Z not homed, performing safe ZHOP before homing X") }
-                G91
-                G0 Z{homing_zhop} F{z_drop_speed}
-                G90
-            {% endif %}
-
+        {% if X %} # Home x
             { action_respond_info("Homing X") }
             
             {% set old_current_x = printer.configfile.config[x_driver ~ ' stepper_x'].run_current|float %}
@@ -214,13 +171,6 @@ gcode:
 
     # Home z
     {% if Z %}
-        {% if not ('x' in printer.toolhead.homed_axes and 'y' in printer.toolhead.homed_axes) %}
-            { action_respond_info("X and/or Y not homed, performing safe ZHOP before homing Z") }
-            G91
-            G0 Z{homing_zhop} F{z_drop_speed}
-            G90
-        {% endif %}
-
         { action_respond_info("Homing Z") }
         
         # go to the center of the bed
